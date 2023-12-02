@@ -2,23 +2,45 @@ package main
 
 import (
 	"fmt"
-	"strconv"
 	"os"
+	"strconv"
 	"strings"
 )
 
 func main() {
+	const numWorkers = 10
 	dat, err := os.ReadFile("data/day1.txt")
 	if err != nil {
 		panic(err)
 	}
 	text := string(dat)
-	lines := strings.Split(strings.ReplaceAll(text, "\r\n", "\n"), "\n")
-	res := 0
-	for _, line := range lines {
-		res += parseLine(line)
+	lines := strings.Split(text, "\n")
+	jobs := make(chan string, len(lines))
+	results := make(chan int, len(lines))
+
+
+	// Start workers
+	for w := 1; w <= numWorkers; w++ {
+		go worker(jobs, results)
 	}
-	fmt.Println("Result: ", res)
+	// Queue up jobs
+	for _, line := range lines {
+		jobs <- line
+	}
+	close(jobs)
+
+	// Reduce results
+	result := 0
+	for r := 1; r <= len(lines); r++ {
+		result += <-results
+	}
+	fmt.Println("Result: ", result)
+}
+
+func worker(jobs <-chan string, results chan<- int) {
+	for j := range jobs {
+		results <- parseLine(j)
+	}
 }
 
 func parseLine(line string) int {
