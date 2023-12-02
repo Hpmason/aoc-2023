@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	dat, err := os.ReadFile("data/day1.txt")
+	dat, err := os.ReadFile("data/day1-ex2.txt")
 	if err != nil {
 		panic(err)
 	}
@@ -23,6 +23,7 @@ func main() {
 }
 
 func parseLine(line string) int {
+	fmt.Println(line)
 	d1 := firstDigit(line)
 	d2 := lastDigit(line)
 	return d1*10 + d2
@@ -30,10 +31,15 @@ func parseLine(line string) int {
 
 func firstDigit(line string) int {
 	strconv.ParseInt(line, 10, 64)
-	for _, c := range line {
+	for i, c := range line {
 		if isDigit(c) {
 			i, _ := strconv.ParseInt(string(c), 10, 64)
 			return int(i)
+		}
+		i, found := hasDigitWord(line, i)
+		if found {
+			fmt.Println(i, string(rune(c)))
+			return i
 		}
 	}
 	return 0
@@ -41,13 +47,36 @@ func firstDigit(line string) int {
 
 func lastDigit(line string) int {
 	for i := range line {
-		c := line[len(line)-1-i]
+		i = len(line)-1-i
+		c := line[i]
 		if isDigit(c) {
-			i, _ := strconv.ParseInt(string(c), 10, 64)
-			return int(i)
+			num, _ := strconv.ParseInt(string(c), 10, 64)
+			return int(num)
+		}
+		num, found := hasDigitWord(line, i)
+		if found {
+			fmt.Println(i, string(rune(c)))
+			return num
 		}
 	}
 	return 0
+}
+
+
+var digits []string = []string{"one", "two", "three", "four", "five", "six", "seven", "eight", "nine"}
+const MAX_DIGIT_LEN int = len("three")
+
+func hasDigitWord(line string, start int) (int, bool) {
+	slice := line[start:]
+	if len(slice) > MAX_DIGIT_LEN {
+		slice = slice[:MAX_DIGIT_LEN]
+	}
+	for i, word := range digits {
+		if strings.Contains(slice, word) {
+			return i+1, true
+		}
+	}
+	return 0, false
 }
 
 
