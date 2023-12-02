@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"strconv"
-	// "io"
 	"os"
 	"strings"
 )
@@ -23,7 +22,6 @@ func main() {
 }
 
 func parseLine(line string) int {
-	fmt.Println(line)
 	d1 := firstDigit(line)
 	d2 := lastDigit(line)
 	return d1*10 + d2
@@ -38,7 +36,6 @@ func firstDigit(line string) int {
 		}
 		i, found := hasDigitWord(line, i)
 		if found {
-			fmt.Println(i, string(rune(c)))
 			return i
 		}
 	}
@@ -55,7 +52,6 @@ func lastDigit(line string) int {
 		}
 		num, found := hasDigitWord(line, i)
 		if found {
-			fmt.Println(i, string(rune(c)))
 			return num
 		}
 	}
@@ -64,13 +60,9 @@ func lastDigit(line string) int {
 
 
 var digits []string = []string{"one", "two", "three", "four", "five", "six", "seven", "eight", "nine"}
-const MAX_DIGIT_LEN int = len("three")
 
 func hasDigitWord(line string, start int) (int, bool) {
 	slice := line[start:]
-	if len(slice) > MAX_DIGIT_LEN {
-		slice = slice[:MAX_DIGIT_LEN]
-	}
 	for i, word := range digits {
 		if len(slice) < len(word) {
 			continue
