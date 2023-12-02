@@ -9,12 +9,11 @@ import (
 )
 
 func main() {
-	dat, err := os.ReadFile("data/day1-ex.txt")
+	dat, err := os.ReadFile("data/day1.txt")
 	if err != nil {
 		panic(err)
 	}
 	text := string(dat)
-	fmt.Print(text)
 	lines := strings.Split(strings.ReplaceAll(text, "\r\n", "\n"), "\n")
 	res := 0
 	for _, line := range lines {
