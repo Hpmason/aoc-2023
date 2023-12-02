@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	dat, err := os.ReadFile("data/day1-ex2.txt")
+	dat, err := os.ReadFile("data/day1.txt")
 	if err != nil {
 		panic(err)
 	}
@@ -72,7 +72,10 @@ func hasDigitWord(line string, start int) (int, bool) {
 		slice = slice[:MAX_DIGIT_LEN]
 	}
 	for i, word := range digits {
-		if strings.Contains(slice, word) {
+		if len(slice) < len(word) {
+			continue
+		}
+		if strings.EqualFold(slice[:len(word)], word) {
 			return i+1, true
 		}
 	}
