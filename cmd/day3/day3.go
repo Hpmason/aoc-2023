@@ -13,7 +13,7 @@ type point struct {
 }
 
 func main() {
-	dat, err := os.ReadFile("data/day3-ex.txt")
+	dat, err := os.ReadFile("data/day3.txt")
 	if err != nil {
 		panic(err)
 	}
