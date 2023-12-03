@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -12,7 +13,7 @@ type point struct {
 }
 
 func main() {
-	dat, err := os.ReadFile("data/day3.txt")
+	dat, err := os.ReadFile("data/day3-ex.txt")
 	if err != nil {
 		panic(err)
 	}
@@ -22,7 +23,7 @@ func main() {
 
 	// Collection of starting positions of part numbers mapped to its length
 	partNumbers := make(map[point]int)
-	symbols := make([]point, 0)
+	gears := make([]point, 0)
 	for j, line := range lines {
 		for i := 0; i < len(line); i++ {
 			if isNum(line[i]) {
@@ -35,14 +36,18 @@ func main() {
 					}
 				}
 				partNumbers[start] = i - start.x + 1
+				if partNumbers[start] == 0 {
+					fmt.Println("Pos ", start.x, ", ", start.y)
+				}
 			} 
-			if isSymbol(byte(line[i])) {
-				symbols = append(symbols, point{i, j})
+			if isGear(byte(line[i])) {
+				gears = append(gears, point{i, j})
 			}
 		}
 	}
 	result := 0
-	for _, p := range symbols {
+	foundNumbers := make([]point, 0)
+	for _, p := range gears {
 		for j := p.y - 1; j <= p.y + 1; j++ {
 			for i := p.x - 1; i <= p.x + 1; i++ {
 				if isNum(lines[j][i]) {
@@ -55,25 +60,38 @@ func main() {
 						} 
 					}
 					key := point{k, j}
-					length, prs := partNumbers[key]
-					if !prs {
-						panic(fmt.Errorf("Could not get number at %d, %d", k, j))
-					}
-					if length > 0 {
-						num, err := strconv.ParseInt(lines[j][k:k+length], 10, 64)
-						if err != nil {
-							panic(err)
-						}
-						result += int(num)
-						partNumbers[key] = 0
+					if _, prs := partNumbers[key]; prs && !slices.Contains(foundNumbers, key) {
+						foundNumbers = append(foundNumbers, key)
 					}
 				}
 			}
-		} 
+		}
+		if len(foundNumbers) == 2 {
+			product := -1
+			for _, n := range foundNumbers {
+				length := partNumbers[n]
+				num, err := strconv.ParseInt(lines[n.y][n.x:n.x+length], 10, 64)
+				if err != nil {
+					panic(fmt.Errorf("\"%s\": x = %d, len = %d", lines[n.y][n.x:], n.x, length))
+				}
+				
+				if product == -1 {
+					product = int(num)
+				} else {
+					product *= int(num)
+				}
+			}
+			result += product
+		}
+		foundNumbers = foundNumbers[:0]
 	}
 	fmt.Println(partNumbers)
-	fmt.Println(symbols)
+	fmt.Println(gears)
 	fmt.Println("Result: ", result)
+}
+
+func isGear(c byte) bool {
+	return c == '*'
 }
 
 func isSymbol(c byte) bool {
